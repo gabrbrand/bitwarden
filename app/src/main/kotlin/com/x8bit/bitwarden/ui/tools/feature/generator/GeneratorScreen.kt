@@ -788,6 +788,9 @@ private fun PasswordTypeContent(
             modifier = Modifier
                 .fillMaxWidth(),
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         PasswordNumbersToggleItem(
             useNumbers = passwordTypeState.useNumbers,
             onPasswordToggleNumbersChange = passwordHandlers.onPasswordToggleNumbersChange,
@@ -795,25 +798,6 @@ private fun PasswordTypeContent(
             modifier = Modifier
                 .fillMaxWidth(),
         )
-        PasswordSpecialCharactersToggleItem(
-            useSpecialChars = passwordTypeState.useSpecialChars,
-            onPasswordToggleSpecialCharactersChange = passwordHandlers
-                .onPasswordToggleSpecialCharactersChange,
-            enabled = passwordTypeState.specialCharsEnabled,
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
-        PasswordAvoidAmbiguousCharsToggleItem(
-            avoidAmbiguousChars = passwordTypeState.avoidAmbiguousChars,
-            onPasswordToggleAvoidAmbiguousCharsChange = passwordHandlers
-                .onPasswordToggleAvoidAmbiguousCharsChange,
-            enabled = passwordTypeState.ambiguousCharsEnabled,
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         PasswordMinNumbersCounterItem(
             minNumbers = passwordTypeState.minNumbers,
             onPasswordMinNumbersCounterChange = passwordHandlers.onPasswordMinNumbersCounterChange,
@@ -826,6 +810,16 @@ private fun PasswordTypeContent(
                 .fillMaxWidth(),
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        PasswordSpecialCharactersToggleItem(
+            useSpecialChars = passwordTypeState.useSpecialChars,
+            onPasswordToggleSpecialCharactersChange = passwordHandlers
+                .onPasswordToggleSpecialCharactersChange,
+            enabled = passwordTypeState.specialCharsEnabled,
+            modifier = Modifier
+                .fillMaxWidth(),
+        )
         PasswordMinSpecialCharactersCounterItem(
             minSpecial = passwordTypeState.minSpecial,
             onPasswordMinSpecialCharactersChange = passwordHandlers
@@ -835,6 +829,17 @@ private fun PasswordTypeContent(
                 passwordTypeState.minSpecialAllowed,
             ),
             minValue = passwordTypeState.minSpecialAllowed,
+            modifier = Modifier
+                .fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        PasswordAvoidAmbiguousCharsToggleItem(
+            avoidAmbiguousChars = passwordTypeState.avoidAmbiguousChars,
+            onPasswordToggleAvoidAmbiguousCharsChange = passwordHandlers
+                .onPasswordToggleAvoidAmbiguousCharsChange,
+            enabled = passwordTypeState.ambiguousCharsEnabled,
             modifier = Modifier
                 .fillMaxWidth(),
         )
@@ -872,7 +877,7 @@ private fun PasswordLowercaseLettersToggleItem(
         isChecked = useLowercase,
         onCheckedChange = onPasswordToggleLowercaseLettersChange,
         enabled = enabled,
-        cardStyle = CardStyle.Middle(),
+        cardStyle = CardStyle.Bottom,
         modifier = modifier.testTag(tag = "LowercaseAtoZToggle"),
     )
 }
@@ -890,26 +895,8 @@ private fun PasswordNumbersToggleItem(
         isChecked = useNumbers,
         onCheckedChange = onPasswordToggleNumbersChange,
         enabled = enabled,
-        cardStyle = CardStyle.Middle(),
+        cardStyle = CardStyle.Top(),
         modifier = modifier.testTag(tag = "NumbersZeroToNineToggle"),
-    )
-}
-
-@Composable
-private fun PasswordSpecialCharactersToggleItem(
-    useSpecialChars: Boolean,
-    onPasswordToggleSpecialCharactersChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    BitwardenSwitch(
-        label = "!@#$%^&*",
-        contentDescription = stringResource(id = R.string.special_characters),
-        isChecked = useSpecialChars,
-        onCheckedChange = onPasswordToggleSpecialCharactersChange,
-        enabled = enabled,
-        cardStyle = CardStyle.Middle(),
-        modifier = modifier.testTag(tag = "SpecialCharactersToggle"),
     )
 }
 
@@ -926,8 +913,26 @@ private fun PasswordMinNumbersCounterItem(
         value = minNumbers.coerceIn(minValue, maxValue),
         range = minValue..maxValue,
         onValueChange = onPasswordMinNumbersCounterChange,
-        cardStyle = CardStyle.Top(),
+        cardStyle = CardStyle.Bottom,
         modifier = modifier.testTag(tag = "MinNumberValueLabel"),
+    )
+}
+
+@Composable
+private fun PasswordSpecialCharactersToggleItem(
+    useSpecialChars: Boolean,
+    onPasswordToggleSpecialCharactersChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    BitwardenSwitch(
+        label = "!@#$%^&*",
+        contentDescription = stringResource(id = R.string.special_characters),
+        isChecked = useSpecialChars,
+        onCheckedChange = onPasswordToggleSpecialCharactersChange,
+        enabled = enabled,
+        cardStyle = CardStyle.Top(),
+        modifier = modifier.testTag(tag = "SpecialCharactersToggle"),
     )
 }
 
@@ -961,7 +966,7 @@ private fun PasswordAvoidAmbiguousCharsToggleItem(
         isChecked = avoidAmbiguousChars,
         enabled = enabled,
         onCheckedChange = onPasswordToggleAvoidAmbiguousCharsChange,
-        cardStyle = CardStyle.Bottom,
+        cardStyle = CardStyle.Full,
         modifier = modifier.testTag(tag = "AvoidAmbiguousCharsToggle"),
     )
 }
