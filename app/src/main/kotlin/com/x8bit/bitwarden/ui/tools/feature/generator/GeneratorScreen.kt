@@ -2,6 +2,7 @@
 
 package com.x8bit.bitwarden.ui.tools.feature.generator
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -430,6 +431,7 @@ private fun CoachMarkScope<ExploreGeneratorCoachMark>.ScrollContent(
                 onDismissCoachMark = onDismissCoachMark,
                 onShowNextCoachMark = onShowNextCoachMark,
                 modifier = Modifier
+                    .animateContentSize()
                     .standardHorizontalMargin()
                     .fillMaxWidth(),
             )
