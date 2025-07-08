@@ -2,6 +2,7 @@
 
 package com.x8bit.bitwarden.ui.tools.feature.generator
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -797,20 +798,23 @@ private fun PasswordTypeContent(
             useNumbers = passwordTypeState.useNumbers,
             onPasswordToggleNumbersChange = passwordHandlers.onPasswordToggleNumbersChange,
             enabled = passwordTypeState.numbersEnabled,
+            counterItemVisible = passwordTypeState.useNumbers,
             modifier = Modifier
                 .fillMaxWidth(),
         )
-        PasswordMinNumbersCounterItem(
-            minNumbers = passwordTypeState.minNumbers,
-            onPasswordMinNumbersCounterChange = passwordHandlers.onPasswordMinNumbersCounterChange,
-            maxValue = max(
-                passwordTypeState.maxNumbersAllowed,
-                passwordTypeState.minNumbersAllowed,
-            ),
-            minValue = passwordTypeState.minNumbersAllowed,
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
+        AnimatedVisibility(visible = passwordTypeState.useNumbers) {
+            PasswordMinNumbersCounterItem(
+                minNumbers = passwordTypeState.minNumbers,
+                onPasswordMinNumbersCounterChange = passwordHandlers.onPasswordMinNumbersCounterChange,
+                maxValue = max(
+                    passwordTypeState.maxNumbersAllowed,
+                    passwordTypeState.minNumbersAllowed,
+                ),
+                minValue = passwordTypeState.minNumbersAllowed,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -819,21 +823,24 @@ private fun PasswordTypeContent(
             onPasswordToggleSpecialCharactersChange = passwordHandlers
                 .onPasswordToggleSpecialCharactersChange,
             enabled = passwordTypeState.specialCharsEnabled,
+            counterItemVisible = passwordTypeState.useSpecialChars,
             modifier = Modifier
                 .fillMaxWidth(),
         )
-        PasswordMinSpecialCharactersCounterItem(
-            minSpecial = passwordTypeState.minSpecial,
-            onPasswordMinSpecialCharactersChange = passwordHandlers
-                .onPasswordMinSpecialCharactersChange,
-            maxValue = max(
-                passwordTypeState.maxSpecialAllowed,
-                passwordTypeState.minSpecialAllowed,
-            ),
-            minValue = passwordTypeState.minSpecialAllowed,
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
+        AnimatedVisibility(visible = passwordTypeState.useSpecialChars) {
+            PasswordMinSpecialCharactersCounterItem(
+                minSpecial = passwordTypeState.minSpecial,
+                onPasswordMinSpecialCharactersChange = passwordHandlers
+                    .onPasswordMinSpecialCharactersChange,
+                maxValue = max(
+                    passwordTypeState.maxSpecialAllowed,
+                    passwordTypeState.minSpecialAllowed,
+                ),
+                minValue = passwordTypeState.minSpecialAllowed,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -890,6 +897,7 @@ private fun PasswordNumbersToggleItem(
     onPasswordToggleNumbersChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    counterItemVisible: Boolean,
 ) {
     BitwardenSwitch(
         label = "0-9",
@@ -897,7 +905,7 @@ private fun PasswordNumbersToggleItem(
         isChecked = useNumbers,
         onCheckedChange = onPasswordToggleNumbersChange,
         enabled = enabled,
-        cardStyle = CardStyle.Top(),
+        cardStyle = if (counterItemVisible) CardStyle.Top() else CardStyle.Full,
         modifier = modifier.testTag(tag = "NumbersZeroToNineToggle"),
     )
 }
@@ -926,6 +934,7 @@ private fun PasswordSpecialCharactersToggleItem(
     onPasswordToggleSpecialCharactersChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    counterItemVisible: Boolean,
 ) {
     BitwardenSwitch(
         label = "!@#$%^&*",
@@ -933,7 +942,7 @@ private fun PasswordSpecialCharactersToggleItem(
         isChecked = useSpecialChars,
         onCheckedChange = onPasswordToggleSpecialCharactersChange,
         enabled = enabled,
-        cardStyle = CardStyle.Top(),
+        cardStyle = if (counterItemVisible) CardStyle.Top() else CardStyle.Full,
         modifier = modifier.testTag(tag = "SpecialCharactersToggle"),
     )
 }
