@@ -104,7 +104,6 @@ class SendViewModel @Inject constructor(
 
     override fun handleAction(action: SendAction): Unit = when (action) {
         SendAction.AboutSendClick -> handleAboutSendClick()
-        SendAction.AddSendClick -> handleAddSendClick()
         is SendAction.AddSendSelected -> handleAddSendSelected(action)
         SendAction.LockClick -> handleLockClick()
         SendAction.RefreshClick -> handleRefreshClick()
@@ -295,12 +294,6 @@ class SendViewModel @Inject constructor(
 
     private fun handleAboutSendClick() {
         sendEvent(SendEvent.NavigateToAboutSend)
-    }
-
-    private fun handleAddSendClick() {
-        mutableStateFlow.update {
-            it.copy(dialogState = SendState.DialogState.SelectSendAddType)
-        }
     }
 
     private fun handleAddSendSelected(action: SendAction.AddSendSelected) {
@@ -589,12 +582,6 @@ data class SendState(
         data class Loading(
             val message: Text,
         ) : DialogState()
-
-        /**
-         * Represents a dialog for selecting a send item type to add.
-         */
-        @Parcelize
-        data object SelectSendAddType : DialogState()
     }
 }
 
@@ -606,11 +593,6 @@ sealed class SendAction {
      * User clicked the about send button.
      */
     data object AboutSendClick : SendAction()
-
-    /**
-     * User clicked add a send.
-     */
-    data object AddSendClick : SendAction()
 
     /**
      * User has selected a new kind of send to create.

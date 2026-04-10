@@ -17,15 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.hideFromAccessibility
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
-import com.bitwarden.ui.platform.base.util.toAnnotatedString
-import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
 import com.bitwarden.ui.platform.components.card.BitwardenInfoCalloutCard
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
@@ -39,7 +34,6 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
 @Composable
 fun SendEmpty(
     policyDisablesSend: Boolean,
-    onAddItemClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -88,21 +82,6 @@ fun SendEmpty(
                 .testTag("EmptySendListText"),
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // This button is hidden from accessibility to avoid duplicate voice over with the FAB
-        val newSendLabel = stringResource(id = BitwardenString.add_a_send)
-        BitwardenFilledButton(
-            onClick = onAddItemClick,
-            label = stringResource(id = BitwardenString.add_a_send),
-            icon = rememberVectorPainter(BitwardenDrawable.ic_plus_small),
-            modifier = Modifier
-                .clearAndSetSemantics {
-                    text = newSendLabel.toAnnotatedString()
-                    hideFromAccessibility()
-                }
-                .standardHorizontalMargin(),
-        )
         Spacer(modifier = Modifier.weight(1F))
         Spacer(modifier = Modifier.navigationBarsPadding())
     }
@@ -118,7 +97,6 @@ private fun SendEmpty_preview() {
         ) {
             SendEmpty(
                 policyDisablesSend = false,
-                onAddItemClick = {},
             )
         }
     }
@@ -134,7 +112,6 @@ private fun SendEmptyPolicyDisabled_preview() {
         ) {
             SendEmpty(
                 policyDisablesSend = true,
-                onAddItemClick = {},
             )
         }
     }

@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -27,14 +26,14 @@ import com.bitwarden.ui.platform.components.content.BitwardenErrorContent
 import com.bitwarden.ui.platform.components.content.BitwardenLoadingContent
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
-import com.bitwarden.ui.platform.components.dialog.BitwardenSelectionDialog
-import com.bitwarden.ui.platform.components.dialog.row.BitwardenBasicDialogRow
-import com.bitwarden.ui.platform.components.fab.BitwardenFloatingActionButton
+import com.bitwarden.ui.platform.components.fab.BitwardenExpandableFloatingActionButton
+import com.bitwarden.ui.platform.components.fab.model.ExpandableFabIcon
+import com.bitwarden.ui.platform.components.fab.model.ExpandableFabOption
+import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.components.scaffold.BitwardenScaffold
 import com.bitwarden.ui.platform.components.scaffold.model.rememberBitwardenPullToRefreshState
 import com.bitwarden.ui.platform.components.snackbar.BitwardenSnackbarHost
 import com.bitwarden.ui.platform.components.snackbar.model.rememberBitwardenSnackbarHostState
-import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.composition.LocalIntentManager
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
@@ -49,9 +48,11 @@ import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
 import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
 import com.x8bit.bitwarden.ui.tools.feature.send.handlers.SendHandlers
 import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
+import com.x8bit.bitwarden.ui.tools.feature.send.util.icon
 import com.x8bit.bitwarden.ui.tools.feature.send.util.selectionText
 import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * UI for the send screen.
@@ -122,7 +123,6 @@ fun SendScreen(
 
     SendDialogs(
         dialogState = state.dialogState,
-        onAddSendSelected = { viewModel.trySendAction(SendAction.AddSendSelected(it)) },
         onDismissRequest = { viewModel.trySendAction(SendAction.DismissDialog) },
     )
 
@@ -168,11 +168,33 @@ fun SendScreen(
                 enter = scaleIn(),
                 exit = scaleOut(),
             ) {
-                BitwardenFloatingActionButton(
-                    onClick = { viewModel.trySendAction(SendAction.AddSendClick) },
-                    painter = rememberVectorPainter(id = BitwardenDrawable.ic_plus_large),
-                    contentDescription = stringResource(id = BitwardenString.add_item),
-                    modifier = Modifier.testTag(tag = "AddItemButton"),
+                BitwardenExpandableFloatingActionButton(
+                    // modifier = Modifier.testTag("AddItemButton"),
+                    items = SendItemType.entries
+                        .map {
+                            ExpandableFabOption(
+                                label = it.selectionText,
+                                icon = IconData.Local(
+                                    iconRes = it.icon,
+                                    contentDescription = null,
+                                    // testTag = "AddSendButton",
+                                ),
+                                onFabOptionClick = {
+                                    viewModel.trySendAction(
+                                        SendAction.AddSendSelected(it),
+                                    )
+                                },
+                            )
+                        }
+                        .toImmutableList(),
+                    expandableFabIcon = ExpandableFabIcon(
+                        icon = IconData.Local(
+                            iconRes = BitwardenDrawable.ic_plus_large,
+                            contentDescription = BitwardenString.add_item.asText(),
+                            // testTag = "AddItemButton",
+                        ),
+                        iconRotation = 45f,
+                    ),
                 )
             }
         },
@@ -191,7 +213,6 @@ fun SendScreen(
 
             SendState.ViewState.Empty -> SendEmpty(
                 policyDisablesSend = state.policyDisablesSend,
-                onAddItemClick = { viewModel.trySendAction(SendAction.AddSendClick) },
                 modifier = modifier,
             )
 
@@ -212,7 +233,6 @@ fun SendScreen(
 @Composable
 private fun SendDialogs(
     dialogState: SendState.DialogState?,
-    onAddSendSelected: (SendItemType) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     when (dialogState) {
@@ -226,18 +246,6 @@ private fun SendDialogs(
         is SendState.DialogState.Loading -> BitwardenLoadingDialog(
             text = dialogState.message(),
         )
-
-        SendState.DialogState.SelectSendAddType -> BitwardenSelectionDialog(
-            title = stringResource(id = BitwardenString.type),
-            onDismissRequest = onDismissRequest,
-        ) {
-            SendItemType.entries.forEach {
-                BitwardenBasicDialogRow(
-                    text = it.selectionText(),
-                    onClick = { onAddSendSelected(it) },
-                )
-            }
-        }
 
         null -> Unit
     }
