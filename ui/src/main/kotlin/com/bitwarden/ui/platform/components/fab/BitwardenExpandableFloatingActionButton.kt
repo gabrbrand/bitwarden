@@ -1,5 +1,6 @@
 package com.bitwarden.ui.platform.components.fab
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -51,6 +52,7 @@ fun BitwardenExpandableFloatingActionButton(
     initialIsExpanded: Boolean = false,
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(value = initialIsExpanded) }
+    BackHandler(isExpanded) { isExpanded = false }
     BitwardenExpandableFloatingActionButton(
         expandableFabIcon = expandableFabIcon,
         items = items,
