@@ -166,6 +166,7 @@ fun CoachMarkScope<AddEditItemCoachMark>.VaultAddEditContent(
                 },
                 textFieldTestTag = "ItemNameEntry",
                 cardStyle = CardStyle.Full,
+                autoFocus = isAddItemMode,
                 modifier = Modifier
                     .fillMaxWidth()
                     .standardHorizontalMargin(),

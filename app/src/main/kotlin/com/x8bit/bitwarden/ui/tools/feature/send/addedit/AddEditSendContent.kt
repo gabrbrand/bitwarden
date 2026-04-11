@@ -116,6 +116,7 @@ fun AddEditSendContent(
             onValueChange = addSendHandlers.onNameChange,
             textFieldTestTag = "SendNameEntry",
             cardStyle = CardStyle.Full,
+            autoFocus = isAddMode,
         )
 
         when (val type = state.selectedType) {

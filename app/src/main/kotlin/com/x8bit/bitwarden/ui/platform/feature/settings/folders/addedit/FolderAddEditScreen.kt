@@ -125,6 +125,7 @@ fun FolderAddEditScreen(
                         },
                         textFieldTestTag = "FolderNameField",
                         cardStyle = CardStyle.Full,
+                        autoFocus = state.isAddMode,
                         modifier = Modifier
                             .standardHorizontalMargin()
                             .fillMaxWidth(),

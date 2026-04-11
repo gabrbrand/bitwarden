@@ -370,6 +370,11 @@ data class FolderAddEditState(
         get() = folderAddEditType is FolderAddEditType.EditItem
 
     /**
+     * Helper to determine if the UI should display the content in add folder mode.
+     */
+    val isAddMode: Boolean get() = folderAddEditType is FolderAddEditType.AddItem
+
+    /**
      * Helper to determine the screen display name.
      */
     val screenDisplayName: Text
