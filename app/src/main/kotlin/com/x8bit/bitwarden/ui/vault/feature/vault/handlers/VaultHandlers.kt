@@ -13,7 +13,6 @@ import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterType
  */
 data class VaultHandlers(
     val vaultFilterTypeSelect: (VaultFilterType) -> Unit,
-    val selectAddItemTypeClickAction: () -> Unit,
     val addItemClickAction: (CreateVaultItemType) -> Unit,
     val searchIconClickAction: () -> Unit,
     val accountLockClickAction: (AccountSummary) -> Unit,
@@ -65,9 +64,6 @@ data class VaultHandlers(
             VaultHandlers(
                 vaultFilterTypeSelect = {
                     viewModel.trySendAction(VaultAction.VaultFilterTypeSelect(it))
-                },
-                selectAddItemTypeClickAction = {
-                    viewModel.trySendAction(VaultAction.SelectAddItemType)
                 },
                 addItemClickAction = { viewModel.trySendAction(VaultAction.AddItemClick(it)) },
                 searchIconClickAction = { viewModel.trySendAction(VaultAction.SearchIconClick) },

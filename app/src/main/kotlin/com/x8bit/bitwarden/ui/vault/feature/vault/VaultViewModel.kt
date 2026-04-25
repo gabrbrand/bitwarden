@@ -323,7 +323,6 @@ class VaultViewModel @Inject constructor(
             VaultAction.DismissImportActionCard -> handleDismissImportActionCard()
             VaultAction.ImportActionCardClick -> handleImportActionCardClick()
             VaultAction.LifecycleResumed -> handleLifecycleResumed()
-            VaultAction.SelectAddItemType -> handleSelectAddItemType()
             VaultAction.DismissFlightRecorderSnackbar -> handleDismissFlightRecorderSnackbar()
             VaultAction.FlightRecorderGoToSettingsClick -> handleFlightRecorderGoToSettingsClick()
             is VaultAction.ShareCipherDecryptionErrorClick -> {
@@ -419,22 +418,6 @@ class VaultViewModel @Inject constructor(
                     VaultEvent.NavigateToItemListing(VaultItemListingType.Archive),
                 )
             }
-        }
-    }
-
-    private fun handleSelectAddItemType() {
-        // If policy is enable for any organization, exclude the card option
-        val excludedOptions = persistentListOfNotNull(
-            CreateVaultItemType.SSH_KEY,
-            CreateVaultItemType.CARD.takeUnless {
-                state.restrictItemTypesPolicyOrgIds.isEmpty()
-            },
-        )
-
-        mutableStateFlow.update {
-            it.copy(
-                dialog = VaultState.DialogState.SelectVaultAddItemType(excludedOptions),
-            )
         }
     }
 
@@ -1556,6 +1539,25 @@ data class VaultState(
         get() = viewState.vaultFilterDataIfRequired(vaultFilterData = vaultFilterData)
 
     /**
+     * Supported [CreateVaultItemType] entries to be displayed in an expandable FAB for selection.
+     */
+    val supportedFabOptions: ImmutableList<CreateVaultItemType>
+        get() = run {
+            // If policy is enabled for any organization, exclude the card option
+            val excludedOptions = persistentListOfNotNull(
+                CreateVaultItemType.SSH_KEY,
+                CreateVaultItemType.CARD.takeUnless {
+                    restrictItemTypesPolicyOrgIds.isEmpty()
+                },
+            )
+
+            return CreateVaultItemType
+                .entries
+                .filterNot { excludedOptions.contains(it) }
+                .toImmutableList()
+        }
+
+    /**
      * Represents the specific view states for the [VaultScreen].
      */
     @Parcelize
@@ -1885,14 +1887,6 @@ data class VaultState(
          */
         @Parcelize
         data object Syncing : DialogState()
-
-        /**
-         * Represents a dialog for selecting a vault item type to add.
-         */
-        @Parcelize
-        data class SelectVaultAddItemType(
-            val excludedOptions: ImmutableList<CreateVaultItemType>,
-        ) : DialogState()
 
         /**
          * Represents a dialog indicating that a cipher decryption error occurred.
@@ -2264,11 +2258,6 @@ sealed class VaultAction {
      * The lifecycle of the VaultScreen has entered a resumed state.
      */
     data object LifecycleResumed : VaultAction()
-
-    /**
-     * User has clicked button to bring up the add item selection dialog.
-     */
-    data object SelectAddItemType : VaultAction()
 
     /**
      * User clicked the upgrade to Premium button.

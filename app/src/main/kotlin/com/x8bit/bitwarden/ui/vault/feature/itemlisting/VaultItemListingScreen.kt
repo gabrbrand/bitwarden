@@ -33,7 +33,11 @@ import com.bitwarden.ui.platform.components.content.BitwardenLoadingContent
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenTwoButtonDialog
+import com.bitwarden.ui.platform.components.fab.BitwardenExpandableFloatingActionButton
 import com.bitwarden.ui.platform.components.fab.BitwardenFloatingActionButton
+import com.bitwarden.ui.platform.components.fab.model.ExpandableFabIcon
+import com.bitwarden.ui.platform.components.fab.model.ExpandableFabOption
+import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.components.scaffold.BitwardenScaffold
 import com.bitwarden.ui.platform.components.scaffold.model.BitwardenPullToRefreshState
 import com.bitwarden.ui.platform.components.scaffold.model.rememberBitwardenPullToRefreshState
@@ -60,7 +64,6 @@ import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManager
 import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
 import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
 import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
-import com.x8bit.bitwarden.ui.vault.components.VaultItemSelectionDialog
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.handlers.VaultItemListingHandlers
@@ -369,14 +372,6 @@ private fun VaultItemListingDialogs(
             )
         }
 
-        is VaultItemListingState.DialogState.VaultItemTypeSelection -> {
-            VaultItemSelectionDialog(
-                onDismissRequest = vaultItemListingHandlers.dismissDialogRequest,
-                onOptionSelected = vaultItemListingHandlers.vaultItemTypeSelected,
-                excludedOptions = dialogState.excludedOptions,
-            )
-        }
-
         is VaultItemListingState.DialogState.TrustPrivilegedAddPrompt -> {
             BitwardenTwoButtonDialog(
                 title = stringResource(BitwardenString.unrecognized_browser),
@@ -475,12 +470,47 @@ private fun VaultItemListingScaffold(
         },
         floatingActionButton = {
             if (state.hasAddItemFabButton) {
-                BitwardenFloatingActionButton(
-                    onClick = vaultItemListingHandlers.addVaultItemClick,
-                    painter = rememberVectorPainter(id = BitwardenDrawable.ic_plus_large),
-                    contentDescription = stringResource(id = BitwardenString.add_item),
-                    modifier = Modifier.testTag(tag = "AddItemButton"),
-                )
+                when (state.itemListingType) {
+                    is VaultItemListingState.ItemListingType.Vault.Folder,
+                    is VaultItemListingState.ItemListingType.Vault.Collection,
+                        -> {
+                        BitwardenExpandableFloatingActionButton(
+                            // modifier = Modifier.testTag("AddItemButton"),
+                            items = state.supportedFabOptions
+                                .map {
+                                    ExpandableFabOption(
+                                        label = it.selectionText.asText(),
+                                        icon = IconData.Local(
+                                            iconRes = it.icon,
+                                            contentDescription = null,
+                                            // testTag = "AddItemButton",
+                                        ),
+                                        onFabOptionClick = {
+                                            vaultItemListingHandlers.vaultItemTypeSelected(it)
+                                        },
+                                    )
+                                }
+                                .toImmutableList(),
+                            expandableFabIcon = ExpandableFabIcon(
+                                icon = IconData.Local(
+                                    iconRes = BitwardenDrawable.ic_plus_large,
+                                    contentDescription = BitwardenString.add_item.asText(),
+                                    // testTag = "AddItemButton",
+                                ),
+                                iconRotation = 45f,
+                            ),
+                        )
+                    }
+
+                    else -> {
+                        BitwardenFloatingActionButton(
+                            onClick = vaultItemListingHandlers.addVaultItemClick,
+                            painter = rememberVectorPainter(id = BitwardenDrawable.ic_plus_large),
+                            contentDescription = stringResource(id = BitwardenString.add_item),
+                            modifier = Modifier.testTag(tag = "AddItemButton"),
+                        )
+                    }
+                }
             }
         },
         overlay = {
@@ -520,7 +550,6 @@ private fun VaultItemListingScaffold(
                     state = state.viewState,
                     policyDisablesSend = state.policyDisablesSend &&
                         state.itemListingType is VaultItemListingState.ItemListingType.Send,
-                    addItemClickAction = vaultItemListingHandlers.addVaultItemClick,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

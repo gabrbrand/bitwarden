@@ -13,7 +13,6 @@ import com.x8bit.bitwarden.ui.vault.feature.vault.VaultNoItems
 fun VaultItemListingEmpty(
     state: VaultItemListingState.ViewState.NoItems,
     policyDisablesSend: Boolean,
-    addItemClickAction: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (state.shouldShowAddButton) {
@@ -22,9 +21,7 @@ fun VaultItemListingEmpty(
             vectorRes = state.vectorRes,
             headerText = state.header?.invoke(),
             message = state.message(),
-            buttonText = state.buttonText(),
             modifier = modifier,
-            addItemClickAction = addItemClickAction,
         )
     } else {
         BitwardenEmptyContent(

@@ -19,7 +19,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,7 +45,10 @@ import com.bitwarden.ui.platform.components.content.BitwardenLoadingContent
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenTwoButtonDialog
-import com.bitwarden.ui.platform.components.fab.BitwardenFloatingActionButton
+import com.bitwarden.ui.platform.components.fab.BitwardenExpandableFloatingActionButton
+import com.bitwarden.ui.platform.components.fab.model.ExpandableFabIcon
+import com.bitwarden.ui.platform.components.fab.model.ExpandableFabOption
+import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.components.scaffold.BitwardenScaffold
 import com.bitwarden.ui.platform.components.scaffold.model.BitwardenPullToRefreshState
 import com.bitwarden.ui.platform.components.scaffold.model.rememberBitwardenPullToRefreshState
@@ -54,7 +56,6 @@ import com.bitwarden.ui.platform.components.snackbar.BitwardenSnackbar
 import com.bitwarden.ui.platform.components.snackbar.BitwardenSnackbarHost
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarHostState
 import com.bitwarden.ui.platform.components.snackbar.model.rememberBitwardenSnackbarHostState
-import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.composition.LocalIntentManager
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
@@ -65,8 +66,6 @@ import com.x8bit.bitwarden.ui.platform.components.dialog.BitwardenMasterPassword
 import com.x8bit.bitwarden.ui.platform.composition.LocalAppReviewManager
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.manager.review.AppReviewManager
-import com.x8bit.bitwarden.ui.vault.components.VaultItemSelectionDialog
-import com.x8bit.bitwarden.ui.vault.components.model.CreateVaultItemType
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
 import com.x8bit.bitwarden.ui.vault.feature.vault.handlers.VaultHandlers
@@ -299,11 +298,31 @@ private fun VaultScreenScaffold(
                 enter = scaleIn(),
                 exit = scaleOut(),
             ) {
-                BitwardenFloatingActionButton(
-                    onClick = vaultHandlers.selectAddItemTypeClickAction,
-                    painter = rememberVectorPainter(id = BitwardenDrawable.ic_plus_large),
-                    contentDescription = stringResource(id = BitwardenString.add_item),
-                    modifier = Modifier.testTag(tag = "AddItemButton"),
+                BitwardenExpandableFloatingActionButton(
+                    // modifier = Modifier.testTag("AddItemButton"),
+                    items = state.supportedFabOptions
+                        .map {
+                            ExpandableFabOption(
+                                label = it.selectionText.asText(),
+                                icon = IconData.Local(
+                                    iconRes = it.icon,
+                                    contentDescription = null,
+                                    // testTag = "AddItemButton",
+                                ),
+                                onFabOptionClick = {
+                                    vaultHandlers.addItemClickAction(it)
+                                },
+                            )
+                        }
+                        .toImmutableList(),
+                    expandableFabIcon = ExpandableFabIcon(
+                        icon = IconData.Local(
+                            iconRes = BitwardenDrawable.ic_plus_large,
+                            contentDescription = BitwardenString.add_item.asText(),
+                            // testTag = "AddItemButton",
+                        ),
+                        iconRotation = 45f,
+                    ),
                 )
             }
         },
@@ -366,11 +385,7 @@ private fun VaultScreenScaffold(
                         message = stringResource(
                             BitwardenString.the_vault_protects_more_than_just_passwords,
                         ),
-                        buttonText = stringResource(BitwardenString.new_login),
                         policyDisablesSend = false,
-                        addItemClickAction = {
-                            vaultHandlers.addItemClickAction(CreateVaultItemType.LOGIN)
-                        },
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -420,14 +435,6 @@ private fun VaultDialogs(
             message = dialogState.message(),
             throwable = dialogState.error,
             onDismissRequest = vaultHandlers.dialogDismiss,
-        )
-
-        is VaultState.DialogState.SelectVaultAddItemType -> VaultItemSelectionDialog(
-            onOptionSelected = {
-                vaultHandlers.addItemClickAction(it)
-            },
-            onDismissRequest = vaultHandlers.dialogDismiss,
-            excludedOptions = dialogState.excludedOptions,
         )
 
         is VaultState.DialogState.CipherDecryptionError -> {

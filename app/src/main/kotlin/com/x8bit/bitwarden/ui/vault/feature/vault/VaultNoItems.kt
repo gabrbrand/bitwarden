@@ -21,22 +21,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
-import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
 import com.bitwarden.ui.platform.components.card.BitwardenInfoCalloutCard
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
-
+// TODO
 /**
  * No items view for the [VaultScreen].
  */
 @Composable
 fun VaultNoItems(
-    addItemClickAction: () -> Unit,
     policyDisablesSend: Boolean,
     message: String,
-    buttonText: String,
     modifier: Modifier = Modifier,
     @DrawableRes vectorRes: Int? = null,
     headerText: String? = null,
@@ -89,15 +86,6 @@ fun VaultNoItems(
                 .standardHorizontalMargin(),
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        BitwardenFilledButton(
-            icon = rememberVectorPainter(BitwardenDrawable.ic_plus_small),
-            modifier = Modifier.standardHorizontalMargin(),
-            onClick = addItemClickAction,
-            label = buttonText,
-        )
-
         Spacer(modifier = Modifier.weight(1F))
         Spacer(modifier = Modifier.navigationBarsPadding())
     }
@@ -117,8 +105,6 @@ private fun VaultNoItems_preview() {
                 message = stringResource(
                     BitwardenString.the_vault_protects_more_than_just_passwords,
                 ),
-                buttonText = stringResource(BitwardenString.new_login),
-                addItemClickAction = {},
                 policyDisablesSend = false,
             )
         }
@@ -137,8 +123,6 @@ private fun VaultNoItemsPolicyDisabled_preview() {
                 message = stringResource(
                     BitwardenString.the_vault_protects_more_than_just_passwords,
                 ),
-                buttonText = stringResource(BitwardenString.new_login),
-                addItemClickAction = {},
                 policyDisablesSend = true,
             )
         }

@@ -841,44 +841,8 @@ class VaultItemListingViewModel @Inject constructor(
         )
     }
 
-    private fun createVaultItemTypeSelectionExcludedOptions(): ImmutableList<CreateVaultItemType> {
-        // If policy is enable for any organization, exclude the card option
-        return if (state.restrictItemTypesPolicyOrgIds.isNotEmpty()) {
-            persistentListOf(
-                CreateVaultItemType.CARD,
-                CreateVaultItemType.FOLDER,
-                CreateVaultItemType.SSH_KEY,
-            )
-        } else {
-            persistentListOf(
-                CreateVaultItemType.SSH_KEY,
-                CreateVaultItemType.FOLDER,
-            )
-        }
-    }
-
     private fun handleAddVaultItemClick() {
         when (val itemListingType = state.itemListingType) {
-            is VaultItemListingState.ItemListingType.Vault.Collection -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
-                            excludedOptions = createVaultItemTypeSelectionExcludedOptions(),
-                        ),
-                    )
-                }
-            }
-
-            is VaultItemListingState.ItemListingType.Vault.Folder -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
-                            excludedOptions = createVaultItemTypeSelectionExcludedOptions(),
-                        ),
-                    )
-                }
-            }
-
             is VaultItemListingState.ItemListingType.Vault -> {
                 sendEvent(
                     VaultItemListingEvent.NavigateToAddVaultItem(
@@ -2915,6 +2879,31 @@ data class VaultItemListingState(
         }
 
     /**
+     * Supported [CreateVaultItemType] entries to be displayed in an expandable FAB for selection.
+     */
+    val supportedFabOptions: ImmutableList<CreateVaultItemType>
+        get() = run {
+            // If policy is enabled for any organization, exclude the card option
+            val excludedOptions = if (restrictItemTypesPolicyOrgIds.isNotEmpty()) {
+                persistentListOf(
+                    CreateVaultItemType.CARD,
+                    CreateVaultItemType.SSH_KEY,
+                    CreateVaultItemType.FOLDER,
+                )
+            } else {
+                persistentListOf(
+                    CreateVaultItemType.SSH_KEY,
+                    CreateVaultItemType.FOLDER,
+                )
+            }
+
+            return CreateVaultItemType
+                .entries
+                .filterNot { excludedOptions.contains(it) }
+                .toImmutableList()
+        }
+
+    /**
      * Whether this represents a listing screen for autofill.
      */
     val isAutofill: Boolean
@@ -3097,14 +3086,6 @@ data class VaultItemListingState(
             val title: Text?,
             val message: Text,
             val selectedCipherId: String,
-        ) : DialogState()
-
-        /**
-         * Represents a selection dialog to choose a vault item type to add to folder.
-         */
-        @Parcelize
-        data class VaultItemTypeSelection(
-            val excludedOptions: ImmutableList<CreateVaultItemType>,
         ) : DialogState()
 
         /**

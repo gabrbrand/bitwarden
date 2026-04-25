@@ -1,6 +1,8 @@
 package com.x8bit.bitwarden.ui.vault.components.model
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 
 /**
@@ -8,34 +10,35 @@ import com.bitwarden.ui.platform.resource.BitwardenString
  */
 enum class CreateVaultItemType(
     @field:StringRes val selectionText: Int,
+    @field:DrawableRes val icon: Int,
 ) {
     /**
      * A login cipher.
      */
-    LOGIN(BitwardenString.log_in_noun),
+    LOGIN(selectionText = BitwardenString.log_in_noun, icon = BitwardenDrawable.ic_globe),
 
     /**
      * A card cipher.
      */
-    CARD(BitwardenString.type_card),
+    CARD(selectionText = BitwardenString.type_card, icon = BitwardenDrawable.ic_payment_card),
 
     /**
-     * A identity cipher.
+     * An identity cipher.
      */
-    IDENTITY(BitwardenString.type_identity),
+    IDENTITY(selectionText = BitwardenString.type_identity, icon = BitwardenDrawable.ic_id_card),
 
     /**
      * A secure note cipher.
      */
-    SECURE_NOTE(BitwardenString.type_secure_note),
+    SECURE_NOTE(selectionText = BitwardenString.type_secure_note, icon = BitwardenDrawable.ic_note),
 
     /**
-     * A SSH key cipher.
+     * An SSH key cipher.
      */
-    SSH_KEY(BitwardenString.type_ssh_key),
+    SSH_KEY(selectionText = BitwardenString.type_ssh_key, icon = BitwardenDrawable.ic_ssh_key),
 
     /**
      * A cipher item folder
      */
-    FOLDER(BitwardenString.folder),
+    FOLDER(selectionText = BitwardenString.folder, icon = BitwardenDrawable.ic_folder),
 }
